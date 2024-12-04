@@ -33,6 +33,5 @@ def add_user(name, username, password, avatar):
     db.session.commit()
 
 
-
 def count_products():
     return Product.query.count()

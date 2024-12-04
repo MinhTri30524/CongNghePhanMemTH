@@ -1,8 +1,9 @@
 import math
 
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, jsonify, session
 import dao
 from app import app
+import utils
 
 
 @app.route("/")
@@ -18,6 +19,46 @@ def index():
     total = dao.count_products()
 
     return render_template("index.html", cate=categories, prods=products, pages=math.ceil(total/page_size))
+
+
+@app.route("/api/carts", methods=['post'])
+def add_to_cart():
+    """
+    "1": {
+        "id": "1",
+        "name": "ABC",
+        "price": 111,
+        "quantity": 1
+    },
+    "2": {
+        "id": "2",
+        "name": "ABC",
+        "price": 111,
+        "quantity": 1
+    }
+    """
+
+    cart = session.get('cart')
+    if not cart:
+        cart = {}
+
+    id = str(request.json.get("id"))
+    name = request.json.get("name")
+    price = request.json.get("price")
+
+    if id in cart:
+        cart[id]["quantity"] += 1
+    else:
+        cart[id] = {
+            "id": id,
+            "name": name,
+            "price": price,
+            "quantity": 1
+        }
+    session['cart'] = cart
+
+    print(cart)
+    return jsonify(utils.stats_cart(cart))
 
 
 @app.route("/register", methods=['get', 'post'])
@@ -40,5 +81,6 @@ def register_view():
 
 
 if __name__ == '__main__':
+    app.secret_key = 'super secret key'
     with app.app_context():
         app.run(debug=True)
