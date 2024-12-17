@@ -10,9 +10,8 @@ function addToCart(id, name, price) {
             'Content-Type': 'application/json'
         }
     }).then(res => res.json()).then(data => {
-        console.info(data);
-        let items = document.getElementsByClassName('cart-counter')
+        let items = document.getElementsByClassName("cart-counter");
         for (let item of items)
             item.innerText = data.total_quantity;
-    })
+    });
 }
